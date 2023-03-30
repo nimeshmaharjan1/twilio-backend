@@ -19,7 +19,7 @@
   const startupButton = document.getElementById("startup-button");
 
   let device;
-  let twilio_token;
+  let twilio_token = "";
   let fromNumber = "+19049064208";
 
   // Event Listeners
