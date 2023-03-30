@@ -19,7 +19,8 @@
   const startupButton = document.getElementById("startup-button");
 
   let device;
-  let token;
+  let twilio_token;
+  let fromNumber = "+19049064208";
 
   // Event Listeners
 
@@ -38,20 +39,23 @@
 
   // SETUP STEP 2: Request an Access Token
   async function startupClient() {
-    const baseUrl = prompt("Enter Basestation API Base url", "http://localhost:3000");
-    const token = prompt("Enter basestation frontend access token:", "");
+    let auth_token = localStorage.getItem("token");
+    let baseUrl = localStorage.getItem("base_url");
 
-    if (!baseUrl || !token) {
+    baseUrl = prompt("Enter Basestation API Base url", baseUrl ?? "http://localhost:3000");
+    auth_token = prompt("Enter basestation frontend access token:", auth_token ?? "");
+
+    if (!baseUrl || !auth_token) {
       alert("Base Url or Token is empty. Please start device again");
       return;
     }
 
-    log("Requesting Access Token from server...");
+    log("Requesting Access Twilio Token from server...");
 
     try {
       const res = await fetch(`${baseUrl.at(-1) === "/" ? baseUrl.slice(0, -1) : baseUrl}/api/v1/inboxes/voice-calls/token`, {
         headers: new Headers({
-          Authorization: `Bearer ${token}`,
+          Authorization: `Bearer ${auth_token}`,
         }),
       });
       const data = await res.json();
@@ -60,15 +64,18 @@
       data.token = data.token ?? data.data.token;
       data.identity = data.identity ?? (Math.random() + 1).toString(36).substring(7);
 
-      data.identity = Math.random();
-      token = data.token;
-
-      console.log("Token: ", data.token);
+      console.log("Twilio Token: ", data.token);
+      twilio_token = data.token;
 
       setClientNameUI(data.identity);
 
       intitializeDevice();
+
+      //store token to local storage
+      localStorage.setItem("token", auth_token);
+      localStorage.setItem("base_url", baseUrl);
     } catch (err) {
+      alert("Error while fetching token");
       console.log(err);
       log("An error occurred. See your browser console for more information.");
     }
@@ -79,7 +86,7 @@
   function intitializeDevice() {
     logDiv.classList.remove("hide");
     log("Initializing device");
-    device = new Twilio.Device(token, {
+    device = new Twilio.Device(twilio_token, {
       logLevel: 1,
       // Set Opus as our preferred codec. Opus generally performs better, requiring less bandwidth and
       // providing better audio quality in restrained network conditions.
@@ -120,6 +127,7 @@
     var params = {
       // get the phone number to call from the DOM
       To: phoneNumberInput.value,
+      From: fromNumber,
     };
 
     if (device) {
