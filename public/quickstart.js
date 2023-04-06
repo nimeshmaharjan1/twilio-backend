@@ -21,6 +21,8 @@
   let device;
   let twilio_token = "";
   let fromNumber = "+19049064208";
+  // let fromNumber = "+14313043932";
+  let userId = "103dcbb4-a47c-4d60-8c6b-e5ea37d34632";
 
   // Event Listeners
 
@@ -128,10 +130,11 @@
       // get the phone number to call from the DOM
       To: phoneNumberInput.value,
       From: fromNumber,
+      user_id: userId,
     };
 
     if (device) {
-      log(`Attempting to call ${params.To} ...`);
+      log(`Attempting to call ${params.To} from ${params.From} ...`);
 
       // Twilio.Device.connect() returns a Call object
       const call = await device.connect({ params });
@@ -153,6 +156,7 @@
 
   function updateUIAcceptedOutgoingCall(call) {
     log("Call in progress ...");
+    log(`Outgoing Call SID: ${call.parameters.CallSid}`);
     callButton.disabled = true;
     outgoingCallHangupButton.classList.remove("hide");
     volumeIndicators.classList.remove("hide");
@@ -169,6 +173,9 @@
   // HANDLE INCOMING CALL
 
   function handleIncomingCall(call) {
+    console.log(call);
+    log(`Incoming Call SID: ${call.parameters.CallSid}`);
+    log(`Incoming Account SID: ${call.parameters.AccountSid}`);
     log(`Incoming call from ${call.parameters.From}`);
 
     //show incoming call div and incoming phone number
