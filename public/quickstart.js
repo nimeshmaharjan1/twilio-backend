@@ -20,9 +20,9 @@
 
   let device;
   let twilio_token = "";
-  let fromNumber = "+19049064208";
-  // let fromNumber = "+14313043932";
-  let userId = "103dcbb4-a47c-4d60-8c6b-e5ea37d34632";
+  // let fromNumber = "+19049064208";
+  let fromNumber = "+14313043932";
+  let userId = "1434540a-0259-4a6b-888c-aa8025a80ed7";
 
   // Event Listeners
 
